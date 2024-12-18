@@ -1,0 +1,15 @@
+{
+  "name": "node",
+  "version": "1.0.0",
+  "description": "node preparation",
+  "main": "App.js",
+  "scripts": {
+    "start": "nodemon App.js"
+  },
+  "author": "naredra",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2"
+  }
+}
