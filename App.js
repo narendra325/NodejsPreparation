@@ -2,8 +2,6 @@ const express = require("express");
 const dotenv = require("dotenv");
 const connectDB = require("./config/database");
 const User = require("./models/user");
-const { error } = require("console");
-const { deflate } = require("zlib");
 dotenv.config();
 const app = express();
 const PORT = process.env.PORT;
@@ -25,16 +23,40 @@ app.use((express.json()))
 //   res.status(500).send({ error: "internal server error" });
 // });
 
+
+app.get("/feed" , async(req,res)=>{
+  try{
+    const users = await User.find({})
+    res.send(users);
+  }
+  catch(error){
+    console.error("unexpected error")
+  }
+
+})
+
+app.get("/user", async(req,res)=>{
+  const userId = req.body.id;
+  try{
+    
+    const user = await User.findOne(userId);
+    res.send(user)
+  }
+  catch(error){
+    console.log("unexpected error")
+  }
+})
+
 app.post("/signup", async (req, res) => {
 
   const {name,age,lastName,emailid,address} = req.body;
   try{
-    const user = new User(name,age,lastName,emailid,address)
+    const user = new User({name,age,lastName,emailid,address})
   await user.save();
   res.send("user is added sucessfully");
   }
   catch (error){
-    if(error.errors=== 'validationError'){
+    if(error.errors=== 'ValidationError'){
         for(const field in error.errors){
           console.error(`validation error for ${field} : ${error.errors[field].message}`)
         }
@@ -48,6 +70,32 @@ app.post("/signup", async (req, res) => {
   }
   
 });
+
+app.delete("/user", async(req,res)=>{
+  const userid = req.body.id;
+  try{
+    const user = await User.findByIdAndDelete(userid);
+   res.send("user deleted sucesfully")
+  }
+  catch(error){
+    console.error("unexpected error")
+  }
+})
+
+app.patch("/user", async(req,res)=>{
+  const userid = req.body.id;
+  const data = req.body;
+  try{
+    console.log(data)
+
+    const user = await User.findByIdAndUpdate(userid,data)
+    console.log('User after update or creation:', user);
+    res.send("user updated")
+  }
+  catch(error){
+    console.log("unexpected error")
+  }
+})
 
 connectDB()
   .then(() => {
